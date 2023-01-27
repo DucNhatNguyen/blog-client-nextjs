@@ -74,10 +74,9 @@ export default function App() {
   const [data, setData] = useState();
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const fetchData = (page) => {
     setLoading(true);
-    fetch(`http://localhost:8080/api/blog?page=${page}&pagesize=10`)
+    fetch(`https://blog-nodejs.onrender.com/api/blog?page=${page}&pagesize=10`)
       .then((res) => res.json())
       .then(({ data, total }) => {
         setData(data);
@@ -96,7 +95,6 @@ export default function App() {
         type="primary"
         danger
         style={{ float: "right", margin: "15px 50px" }}
-        //onClick={() => router.push("/Blog")}
       >
         Add
       </Button>
@@ -105,7 +103,7 @@ export default function App() {
         columns={columns}
         dataSource={data}
         pagination={{
-          pagesize: 10,
+          pageSize: 10,
           total: total,
           onChange: (page) => {
             fetchData(page);

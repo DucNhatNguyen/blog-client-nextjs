@@ -8,7 +8,7 @@ const BreadCrumb = () => {
   const breadCrumbView = () => {
     const { asPath } = router;
     const pathnames = asPath.split("/").filter((item) => item);
-    console.log(router);
+    //console.log(router);
     const capatilize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
     return (
       <div>

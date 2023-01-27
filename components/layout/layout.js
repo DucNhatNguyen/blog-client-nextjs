@@ -13,12 +13,12 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const items = [
   {
-    label: <Link href="/Blog">Submenu 1</Link>,
+    label: <Link href="/Blog">Blogs</Link>,
     key: "1",
     icon: <DashboardOutlined />,
   },
   {
-    label: <Link href="/menu2">Submenu 2</Link>,
+    label: <Link href="/Category">Chuyên mục</Link>,
     key: "2",
     icon: <AppstoreOutlined />,
   },
@@ -93,7 +93,7 @@ const App = ({ children }) => {
               fontSize: "35px",
             }}
           >
-            <p className="header-title">Danh sách Blogs</p>
+            <span className="header-title">Danh sách Blogs</span>
           </div>
         </Header>
         <BreadCrumb />

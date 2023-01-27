@@ -15,6 +15,9 @@ import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
+import moment from "moment";
+import "dayjs/locale/vi";
+import locale from "antd/es/date-picker/locale/vi_VN";
 
 const modules = {
   toolbar: [
@@ -69,55 +72,39 @@ export default function App() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();
-  const [data, setData] = useState({
-    id: "9f93ab1e-d25f-469b-bd00-46953538788e",
-    author: 1,
-    publicdate: "2015-01-30",
-    sortdesc: "sdsdsdsdsds",
-    status: 2,
-    thumbnail:
-      "https://dev.navicdn.com/test/podcasts/thumbnail/2022/12/27/jpg-20221227-162230-0000_20221227163848.jpg",
-    view: null,
-    slug: "sdsdsdsdsds",
-    ishotblog: null,
-    cateid: 2,
-    title: "hard",
-    content: "lele",
-  });
+  const [data, setData] = useState({});
+  const [form] = Form.useForm();
 
   const slug = router.query.slug;
-  const fetchData = async () => {
-    const response = await fetch(`http://localhost:8080/api/blog/${slug}`);
-    const data = await response.json();
-    console.log(data);
-    setData(data);
-  };
-
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`).then(
+      async (res) => {
+        const da = await res.json();
+        form.setFieldsValue({ ...da });
+        setData({ ...da });
+      }
+    );
+  }, [form, slug]);
 
   const onFinish = async (values) => {
-    console.log("Success:", values);
     const { thumbnail, ...valuesRest } = values;
 
-    await fetch(`http://localhost:8080/api/blog/${slug}`, {
+    await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
       method: "PUT",
       body: JSON.stringify(valuesRest),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
-    })
-      .then(async (res) => await res.json())
-      .then((res, { data }) => {
-        if (res.status === 200) {
-          message.success(`Edit success`);
-          setData(data);
-        } else {
-          message.error(`Edit fail`);
-        }
-      });
+    }).then(async (res) => {
+      const da = await res.json();
+      if (res.status === 200) {
+        message.success(`Cập nhật bài viết thành công.`);
+        setData(data);
+      } else {
+        message.error(`Cập nhật bài viết không thành công.`);
+      }
+    });
   };
 
   const onChange = (info) => {
@@ -149,21 +136,24 @@ export default function App() {
       </div>
     </div>
   );
+
+  const worker = moment(data.publicdate, "YYYY-MM-DD");
+  console.log("object", worker);
   return (
     <Form
       name="basic"
       layout="vertical"
-      initialValues={{ remember: true }}
+      initialValues={{ remember: true, publicdate: worker }}
       autoComplete="off"
       style={{ padding: "25px" }}
       onFinish={onFinish}
+      form={form}
     >
       <Row gutter={[32]}>
         <Col span={12}>
           <Form.Item
             label="Title"
             name="title"
-            initialValue={data.title}
             rules={[{ required: true }, { type: "string", min: 3 }]}
           >
             <Input size="large" />
@@ -173,7 +163,6 @@ export default function App() {
           <Form.Item
             label="Slug"
             name="slug"
-            initialValue={data.slug}
             rules={[{ required: true }, { type: "string", min: 3 }]}
           >
             <Input size="large" />
@@ -183,20 +172,17 @@ export default function App() {
           <Form.Item
             label="Sort description"
             name="sortdesc"
-            initialValue={data.sortdesc}
             rules={[{ required: false }, { type: "string", min: 3 }]}
           >
             <Input.TextArea rows={2} />
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item
-            label="Status"
-            name="status"
-            initialValue={data.status}
-            rules={[{ required: true }]}
-          >
-            <Select size="large" options={options} />
+          <Form.Item label="Status" name="status" rules={[{ required: true }]}>
+            <Select size="large" defaultValue="demo1">
+              <Select.Option value="demo">Demo</Select.Option>
+              <Select.Option value="demo1">Demosdsdssd1</Select.Option>
+            </Select>
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -230,31 +216,30 @@ export default function App() {
           <Form.Item
             label="Category"
             name="cateid"
-            initialValue={data.cateid}
             rules={[{ required: true }]}
           >
             <Select size="large" options={options} />
           </Form.Item>
         </Col>
-        <Col span={12}>
+        {/* <Col span={12}>
           <Form.Item
+            name="publicdateVal"
             label="Public date"
-            name="publicdate"
-            initialValue={dayjs(data.publicdate, "DD/MM/YYYY")}
             rules={[{ required: true }]}
           >
             <DatePicker
-              format={["DD/MM/YYYY", "DD/MM/YY"]}
+              format="YYYY-MM-DD"
               size="large"
               style={{ width: "100%" }}
+              value={dayjs("2021-01-30", "YYYY-MM-DD")}
+              locale={locale}
             />
           </Form.Item>
-        </Col>
+        </Col> */}
         <Col span={24}>
           <Form.Item
             label="Content"
             name="content"
-            initialValue={data.content}
             //rules={[{ required: true }]}
           >
             <ReactQuill theme="snow" modules={modules} formats={formats} />
