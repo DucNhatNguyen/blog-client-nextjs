@@ -6,6 +6,7 @@ export default function PopupCate({
   onCancel,
   onCreate,
   confirmModalLoading,
+  parentCates,
 }) {
   const [form] = Form.useForm();
   const [autoSlug, setAutoSlug] = useState("");
@@ -21,6 +22,7 @@ export default function PopupCate({
   useEffect(() => {
     form.setFieldsValue({ slug: slugify(autoSlug) });
   }, [autoSlug, form]);
+
   return (
     <Modal
       open={open}
@@ -77,7 +79,7 @@ export default function PopupCate({
             },
           ]}
         >
-          <Input />
+          <Input disabled />
         </Form.Item>
 
         <Form.Item label="Trạng thái">
@@ -92,13 +94,7 @@ export default function PopupCate({
         </Form.Item>
 
         <Form.Item name="parentid" label="Chuyên mục Cha">
-          <Select
-            options={[
-              { value: 1, label: "cha 1" },
-              { value: 2, label: "cha 2" },
-              { value: 3, label: "cha 3" },
-            ]}
-          />
+          <Select options={parentCates} defaultValue={0} />
         </Form.Item>
       </Form>
     </Modal>

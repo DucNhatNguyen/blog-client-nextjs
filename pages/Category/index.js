@@ -14,6 +14,7 @@ export default function Category() {
   const [openModal, setOpenModal] = useState(false);
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [selectedId, setSelectedId] = useState(0);
+  const [parentCate, setParentCate] = useState([]);
 
   const columns = [
     {
@@ -77,8 +78,25 @@ export default function Category() {
       });
   };
 
+  const fetchCateParents = () => {
+    fetch(`https://blog-nodejs.onrender.com/api/category/parent`).then(
+      async (res) => {
+        const da = await res.json();
+        const options = da.data.map((x) => ({
+          value: x.id,
+          label: x.title,
+        }));
+        setParentCate([
+          { value: 0, label: "--Không đặt Chuyên mục cha--" },
+          ...options,
+        ]);
+      }
+    );
+  };
+
   useEffect(() => {
     fetchData(1);
+    fetchCateParents();
   }, []);
 
   const handleOkModal = async (values, id) => {
@@ -191,6 +209,7 @@ export default function Category() {
           setSelectedId(0);
         }}
         confirmModalLoading={confirmModalLoading}
+        parentCates={parentCate}
       />
 
       <PopupCreate
@@ -200,6 +219,7 @@ export default function Category() {
         }}
         onCreate={handleCreate}
         confirmModalLoading={confirmModalLoading}
+        parentCates={parentCate}
       />
     </>
   );

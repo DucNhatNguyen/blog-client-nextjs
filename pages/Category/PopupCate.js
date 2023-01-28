@@ -7,6 +7,7 @@ export default function PopupCate({
   onSubmit,
   onCancel,
   confirmModalLoading,
+  parentCates,
 }) {
   const [form] = Form.useForm();
   const [data, setData] = useState({});
@@ -88,13 +89,7 @@ export default function PopupCate({
         </Form.Item>
 
         <Form.Item name="parentid" label="Chuyên mục Cha">
-          <Select
-            options={[
-              { value: 1, label: "cha 1" },
-              { value: 2, label: "cha 2" },
-              { value: 3, label: "cha 3" },
-            ]}
-          />
+          <Select options={parentCates} />
         </Form.Item>
       </Form>
     </Modal>
