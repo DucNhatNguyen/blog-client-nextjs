@@ -1,3 +1,4 @@
+import React from "react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 
@@ -43,7 +44,7 @@ const formats = [
   "video",
 ];
 
-export default function Home() {
+export default function Editor({ text }) {
   return (
     <QuillNoSSRWrapper
       modules={modules}
@@ -51,9 +52,8 @@ export default function Home() {
       theme="snow"
       onChange={(content) => {
         // var htmlToRtf = require('html-to-rtf');
-        console.log("CONTETN: ", content);
       }}
-      className="content"
+      value={text}
     />
   );
 }

@@ -1,23 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import {
-  Button,
-  Upload,
-  Form,
-  Input,
-  Row,
-  Col,
-  message,
-  Select,
-  DatePicker,
-} from "antd";
+import { Button, Upload, Form, Input, Row, Col, message, Select } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
-import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
 import moment from "moment";
 import "dayjs/locale/vi";
-import locale from "antd/es/date-picker/locale/vi_VN";
+import Editor from "../../components/Editor";
 
 const modules = {
   toolbar: [
@@ -62,49 +49,36 @@ const getBase64 = (img, callback) => {
   reader.readAsDataURL(img);
 };
 
-const options = [
-  { value: "1", label: "Cong khai" },
-  { value: "2", label: "Moi" },
-  { value: "3", label: "Huy bo" },
-];
-
 export default function App() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();
   const [data, setData] = useState({});
+  const [childCate, setChildCate] = useState([]);
   const [form] = Form.useForm();
 
   const slug = router.query.slug;
-  useEffect(() => {
-    fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`).then(
-      async (res) => {
-        const da = await res.json();
-        form.setFieldsValue({ ...da });
-        setData({ ...da });
-      }
-    );
-  }, [form, slug]);
 
   const onFinish = async (values) => {
-    const { thumbnail, ...valuesRest } = values;
+    console.log("inputt", values);
+    // const { thumbnail, ...valuesRest } = values;
 
-    await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
-      method: "PUT",
-      body: JSON.stringify(valuesRest),
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-    }).then(async (res) => {
-      const da = await res.json();
-      if (res.status === 200) {
-        message.success(`Cập nhật bài viết thành công.`);
-        setData(data);
-      } else {
-        message.error(`Cập nhật bài viết không thành công.`);
-      }
-    });
+    // await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
+    //   method: "PUT",
+    //   body: JSON.stringify(valuesRest),
+    //   headers: {
+    //     "Access-Control-Allow-Origin": "*",
+    //     "Content-Type": "application/json",
+    //   },
+    // }).then(async (res) => {
+    //   const da = await res.json();
+    //   if (res.status === 200) {
+    //     message.success(`Cập nhật bài viết thành công.`);
+    //     setData(data);
+    //   } else {
+    //     message.error(`Cập nhật bài viết không thành công.`);
+    //   }
+    // });
   };
 
   const onChange = (info) => {
@@ -137,13 +111,39 @@ export default function App() {
     </div>
   );
 
-  const worker = moment(data.publicdate, "YYYY-MM-DD");
-  console.log("object", worker);
+  const fetchChildCates = () => {
+    fetch(`https://blog-nodejs.onrender.com/api/category/child`).then(
+      async (res) => {
+        const da = await res.json();
+        const options = da.data.map((x) => ({
+          value: x.id,
+          label: x.title,
+        }));
+        setChildCate([{ value: 0, label: "--Chọn chuyên mục--" }, ...options]);
+      }
+    );
+  };
+
+  useEffect(() => {
+    fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`).then(
+      async (res) => {
+        const da = await res.json();
+        form.setFieldsValue({ ...da });
+        setData({ ...da });
+      }
+    );
+
+    //get child cates
+    fetchChildCates();
+  }, [form, slug]);
+
+  //const worker = moment(data.publicdate, "YYYY-MM-DD");
+  //console.log("object", worker);
   return (
     <Form
       name="basic"
       layout="vertical"
-      initialValues={{ remember: true, publicdate: worker }}
+      initialValues={{ remember: true }}
       autoComplete="off"
       style={{ padding: "25px" }}
       onFinish={onFinish}
@@ -178,11 +178,13 @@ export default function App() {
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item label="Status" name="status" rules={[{ required: true }]}>
-            <Select size="large" defaultValue="demo1">
-              <Select.Option value="demo">Demo</Select.Option>
-              <Select.Option value="demo1">Demosdsdssd1</Select.Option>
-            </Select>
+          <Form.Item label="Trạng thái" name="status">
+            <Select
+              options={[
+                { value: 1, label: "Hoạt động" },
+                { value: 2, label: "Tạm ẩn" },
+              ]}
+            />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -213,12 +215,8 @@ export default function App() {
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item
-            label="Category"
-            name="cateid"
-            rules={[{ required: true }]}
-          >
-            <Select size="large" options={options} />
+          <Form.Item label="Chuyên mục" name="cateid">
+            <Select options={childCate} />
           </Form.Item>
         </Col>
         {/* <Col span={12}>
@@ -238,11 +236,12 @@ export default function App() {
         </Col> */}
         <Col span={24}>
           <Form.Item
-            label="Content"
+            label="Nội dung"
             name="content"
-            //rules={[{ required: true }]}
+            rules={[{ required: true }]}
+            key={"content"}
           >
-            <ReactQuill theme="snow" modules={modules} formats={formats} />
+            <Editor text={data.content} />
           </Form.Item>
         </Col>
         <Col span={24}>
