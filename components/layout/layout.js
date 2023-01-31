@@ -93,7 +93,7 @@ const App = ({ children }) => {
               fontSize: "35px",
             }}
           >
-            <span className="header-title">Danh sách Blogs</span>
+            <span className="header-title">gagagagagagag</span>
           </div>
         </Header>
         <BreadCrumb />

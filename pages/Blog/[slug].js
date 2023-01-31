@@ -4,11 +4,12 @@ import { Button, Upload, Form, Input, Row, Col, message, Select } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import moment from "moment";
 import "dayjs/locale/vi";
-import Editor from "../../components/Editor";
+import dynamic from "next/dynamic";
+import "react-quill/dist/quill.snow.css";
 
 const modules = {
   toolbar: [
-    [{ header: "1" }, { header: "2" }, { font: [] }],
+    [{ header: "1" }, { header: "2" }, { font: ['Montserrat'] }],
     [{ size: [] }],
     ["bold", "italic", "underline", "strike", "blockquote"],
     [
@@ -48,6 +49,11 @@ const getBase64 = (img, callback) => {
   reader.addEventListener("load", () => callback(reader.result));
   reader.readAsDataURL(img);
 };
+
+const QuillNoSSRWrapper = dynamic(import("react-quill"), {
+  ssr: false,
+  loading: () => <p>Loading ...</p>,
+});
 
 export default function App() {
   const router = useRouter();
@@ -125,6 +131,9 @@ export default function App() {
   };
 
   useEffect(() => {
+    //get child cates
+    fetchChildCates();
+    
     fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`).then(
       async (res) => {
         const da = await res.json();
@@ -132,9 +141,6 @@ export default function App() {
         setData({ ...da });
       }
     );
-
-    //get child cates
-    fetchChildCates();
   }, [form, slug]);
 
   //const worker = moment(data.publicdate, "YYYY-MM-DD");
@@ -241,7 +247,16 @@ export default function App() {
             rules={[{ required: true }]}
             key={"content"}
           >
-            <Editor text={data.content} />
+            
+            <QuillNoSSRWrapper
+              modules={modules}
+              formats={formats}
+              theme="snow"
+              onChange={(content) => {
+                // var htmlToRtf = require('html-to-rtf');
+                console.log(content)
+              }}
+            />
           </Form.Item>
         </Col>
         <Col span={24}>
