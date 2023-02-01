@@ -206,7 +206,7 @@ export default function App() {
             rules={[{ required: true }]}
           >
             <Upload
-              action={"http://localhost:8080/api/blog/upload"}
+              action={"https://blog-nodejs.onrender.com/api/blog/upload"}
               accept=".png, .jpg, .jpeg"
               beforeUpload={beforeUpload}
               onChange={onChange}
