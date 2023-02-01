@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { Button, Upload, Form, Input, Row, Col, message, Select } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import moment from "moment";
 import "dayjs/locale/vi";
-import dynamic from "next/dynamic";
-import "react-quill/dist/quill.snow.css";
+//import dynamic from "next/dynamic";
+//import "react-quill/dist/quill.snow.css";
+import { Editor } from '@tinymce/tinymce-react';
 
 const modules = {
   toolbar: [
@@ -50,10 +51,10 @@ const getBase64 = (img, callback) => {
   reader.readAsDataURL(img);
 };
 
-const QuillNoSSRWrapper = dynamic(import("react-quill"), {
-  ssr: false,
-  loading: () => <p>Loading ...</p>,
-});
+// const QuillNoSSRWrapper = dynamic(import("react-quill"), {
+//   ssr: false,
+//   loading: () => <p>Loading ...</p>,
+// });
 
 export default function App() {
   const router = useRouter();
@@ -61,12 +62,13 @@ export default function App() {
   const [imageUrl, setImageUrl] = useState();
   const [data, setData] = useState({});
   const [childCate, setChildCate] = useState([]);
+  const [content, setContent] = useState("");
   const [form] = Form.useForm();
 
   const slug = router.query.slug;
 
   const onFinish = async (values) => {
-    console.log("inputt", values);
+    console.log("inputt", {...values, content});
     // const { thumbnail, ...valuesRest } = values;
 
     // await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
@@ -142,6 +144,22 @@ export default function App() {
       }
     );
   }, [form, slug]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setContent(value)
+  };
+
+  const parseEditorData = (content, editor) => {
+    const { targetElm } = editor;
+    const { name } = targetElm;
+    return {
+      target: {
+        name,
+        value: content
+      }
+    };
+  };
 
   //const worker = moment(data.publicdate, "YYYY-MM-DD");
   //console.log("object", worker);
@@ -245,17 +263,14 @@ export default function App() {
             label="Nội dung"
             name="content"
             rules={[{ required: true }]}
-            key={"content"}
           >
-            
-            <QuillNoSSRWrapper
-              modules={modules}
-              formats={formats}
-              theme="snow"
-              onChange={(content) => {
-                // var htmlToRtf = require('html-to-rtf');
-                console.log(content)
+            <Editor
+              apiKey='6vtz7yc7wtqz403rvcox0gquz2b707uuinaxql67j2ftnlmt'
+              onEditorChange={(content, editor) => {
+                handleChange(parseEditorData(content, editor))
               }}
+              textareaName="content"
+              value={content}
             />
           </Form.Item>
         </Col>
