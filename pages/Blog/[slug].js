@@ -1,60 +1,17 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Button, Upload, Form, Input, Row, Col, message, Select } from "antd";
+import { Button, Upload, Form, Input, Row, Col, message, Select, DatePicker } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import moment from "moment";
 import "dayjs/locale/vi";
-//import dynamic from "next/dynamic";
-//import "react-quill/dist/quill.snow.css";
 import { Editor } from '@tinymce/tinymce-react';
-
-const modules = {
-  toolbar: [
-    [{ header: "1" }, { header: "2" }, { font: ['Montserrat'] }],
-    [{ size: [] }],
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [
-      { list: "ordered" },
-      { list: "bullet" },
-      { indent: "-1" },
-      { indent: "+1" },
-    ],
-    ["link", "image", "video"],
-    ["clean"],
-  ],
-  clipboard: {
-    // toggle to add extra line breaks when pasting HTML:
-    matchVisual: false,
-  },
-};
-
-const formats = [
-  "header",
-  "font",
-  "size",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "blockquote",
-  "list",
-  "bullet",
-  "indent",
-  "link",
-  "image",
-  "video",
-];
+import Slugify from 'slugify'
 
 const getBase64 = (img, callback) => {
   const reader = new FileReader();
   reader.addEventListener("load", () => callback(reader.result));
   reader.readAsDataURL(img);
 };
-
-// const QuillNoSSRWrapper = dynamic(import("react-quill"), {
-//   ssr: false,
-//   loading: () => <p>Loading ...</p>,
-// });
 
 export default function App() {
   const router = useRouter();
@@ -63,6 +20,7 @@ export default function App() {
   const [data, setData] = useState({});
   const [childCate, setChildCate] = useState([]);
   const [content, setContent] = useState("");
+  const [autoSlug, setAutoSlug] = useState("");
   const [form] = Form.useForm();
 
   const slug = router.query.slug;
@@ -161,6 +119,18 @@ export default function App() {
     };
   };
 
+  // const slugify = (str) =>
+  //   str
+  //     .toLowerCase()
+  //     .trim()
+  //     .replace(/[^\w\s-]/g, "")
+  //     .replace(/[\s_-]+/g, "-")
+  //     .replace(/^-+|-+$/g, "");
+
+  useEffect(() => {
+    form.setFieldsValue({ slug: Slugify(autoSlug) });
+  }, [autoSlug, form]);
+
   //const worker = moment(data.publicdate, "YYYY-MM-DD");
   //console.log("object", worker);
   return (
@@ -180,7 +150,11 @@ export default function App() {
             name="title"
             rules={[{ required: true }, { type: "string", min: 3 }]}
           >
-            <Input size="large" />
+            <Input 
+            size="large" 
+            onBlur={(e) => {
+              setAutoSlug(e.target.value);
+            }} />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -243,21 +217,20 @@ export default function App() {
             <Select options={childCate} />
           </Form.Item>
         </Col>
-        {/* <Col span={12}>
+        <Col span={12}>
           <Form.Item
-            name="publicdateVal"
+            name="publicdate"
             label="Public date"
             rules={[{ required: true }]}
           >
             <DatePicker
-              format="YYYY-MM-DD"
+              //format="YYYY-MM-DD"
               size="large"
               style={{ width: "100%" }}
-              value={dayjs("2021-01-30", "YYYY-MM-DD")}
-              locale={locale}
+              //locale={locale}
             />
           </Form.Item>
-        </Col> */}
+        </Col>
         <Col span={24}>
           <Form.Item
             label="Nội dung"
@@ -266,6 +239,7 @@ export default function App() {
           >
             <Editor
               apiKey='6vtz7yc7wtqz403rvcox0gquz2b707uuinaxql67j2ftnlmt'
+              
               onEditorChange={(content, editor) => {
                 handleChange(parseEditorData(content, editor))
               }}
