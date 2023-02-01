@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Button, Upload, Form, Input, Row, Col, message, Select, DatePicker } from "antd";
+import {
+  Button,
+  Upload,
+  Form,
+  Input,
+  Row,
+  Col,
+  message,
+  Select,
+  DatePicker,
+} from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import moment from "moment";
 import "dayjs/locale/vi";
-import { Editor } from '@tinymce/tinymce-react';
-import Slugify from 'slugify'
+import { Editor } from "@tinymce/tinymce-react";
+import Slugify from "slugify";
 
 const getBase64 = (img, callback) => {
   const reader = new FileReader();
@@ -26,7 +36,7 @@ export default function App() {
   const slug = router.query.slug;
 
   const onFinish = async (values) => {
-    console.log("inputt", {...values, content});
+    console.log("inputt", { ...values, content });
     // const { thumbnail, ...valuesRest } = values;
 
     // await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
@@ -49,6 +59,7 @@ export default function App() {
 
   const onChange = (info) => {
     getBase64(info.file.originFileObj, (url) => {
+      console.log("urlthum", url);
       setImageUrl(url);
     });
   };
@@ -93,7 +104,7 @@ export default function App() {
   useEffect(() => {
     //get child cates
     fetchChildCates();
-    
+
     fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`).then(
       async (res) => {
         const da = await res.json();
@@ -105,7 +116,7 @@ export default function App() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setContent(value)
+    setContent(value);
   };
 
   const parseEditorData = (content, editor) => {
@@ -114,25 +125,27 @@ export default function App() {
     return {
       target: {
         name,
-        value: content
-      }
+        value: content,
+      },
     };
   };
 
-  // const slugify = (str) =>
-  //   str
-  //     .toLowerCase()
-  //     .trim()
-  //     .replace(/[^\w\s-]/g, "")
-  //     .replace(/[\s_-]+/g, "-")
-  //     .replace(/^-+|-+$/g, "");
+  const requestCloudinaryUpload = (file) => {
+    return fetch("")
+      .then((res) => res.data)
+      .catch((err) => console.log("err upload", err));
+  };
+
+  const handleFileUpload = (e) => {
+    const uploadData = new FormData();
+    uploadData.append("file", e.target.files[0], "file");
+    requestCloudinaryUpload(uploadData);
+  };
 
   useEffect(() => {
     form.setFieldsValue({ slug: Slugify(autoSlug) });
   }, [autoSlug, form]);
 
-  //const worker = moment(data.publicdate, "YYYY-MM-DD");
-  //console.log("object", worker);
   return (
     <Form
       name="basic"
@@ -150,11 +163,12 @@ export default function App() {
             name="title"
             rules={[{ required: true }, { type: "string", min: 3 }]}
           >
-            <Input 
-            size="large" 
-            onBlur={(e) => {
-              setAutoSlug(e.target.value);
-            }} />
+            <Input
+              size="large"
+              onBlur={(e) => {
+                setAutoSlug(e.target.value);
+              }}
+            />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -170,7 +184,7 @@ export default function App() {
           <Form.Item
             label="Sort description"
             name="sortdesc"
-            rules={[{ required: false }, { type: "string", min: 3 }]}
+            rules={[{ required: true }]}
           >
             <Input.TextArea rows={2} />
           </Form.Item>
@@ -192,11 +206,13 @@ export default function App() {
             rules={[{ required: true }]}
           >
             <Upload
+              action={"http://localhost:8080/api/blog/upload"}
+              accept=".png, .jpg, .jpeg"
               beforeUpload={beforeUpload}
               onChange={onChange}
               listType="picture-card"
               showUploadList={false}
-              className="avatar-uploader"
+              name="file"
             >
               {imageUrl ? (
                 <img
@@ -221,13 +237,18 @@ export default function App() {
           <Form.Item
             name="publicdate"
             label="Public date"
+            getValueFromEvent={(onChange) =>
+              moment(onChange).format("DD/MM/YYYY")
+            }
+            getValueProps={(i) => ({ value: moment(i) })}
             rules={[{ required: true }]}
           >
             <DatePicker
-              //format="YYYY-MM-DD"
-              size="large"
-              style={{ width: "100%" }}
-              //locale={locale}
+              format="DD/MM/YYYY"
+              // size="large"
+              // style={{ width: "100%" }}
+              value={moment()}
+              disabled
             />
           </Form.Item>
         </Col>
@@ -238,10 +259,9 @@ export default function App() {
             rules={[{ required: true }]}
           >
             <Editor
-              apiKey='6vtz7yc7wtqz403rvcox0gquz2b707uuinaxql67j2ftnlmt'
-              
+              apiKey="6vtz7yc7wtqz403rvcox0gquz2b707uuinaxql67j2ftnlmt"
               onEditorChange={(content, editor) => {
-                handleChange(parseEditorData(content, editor))
+                handleChange(parseEditorData(content, editor));
               }}
               textareaName="content"
               value={content}
