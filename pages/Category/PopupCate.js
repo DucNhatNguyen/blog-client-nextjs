@@ -21,7 +21,7 @@ export default function PopupCate({
         form.setFieldsValue({ ...da });
         setData(da);
       }
-    );
+    ); 
   }, [form, id]);
 
   return (

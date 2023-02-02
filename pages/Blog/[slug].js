@@ -36,7 +36,7 @@ export default function App() {
   const slug = router.query.slug;
 
   const onFinish = async (values) => {
-    console.log("inputt", { ...values, content });
+    console.log("inputt", { ...values, content,  });
     // const { thumbnail, ...valuesRest } = values;
 
     // await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
@@ -58,10 +58,21 @@ export default function App() {
   };
 
   const onChange = (info) => {
-    getBase64(info.file.originFileObj, (url) => {
-      console.log("urlthum", url);
-      setImageUrl(url);
-    });
+    console.log(info.file)
+    if (info.file.status == 'uploading'){
+      setLoading(true);
+      message.success(`Đang cập nhật avatar...`);
+    }
+    if (info.file.status == 'error'){
+      setLoading(false);
+      setImageUrl(info.file.response.image_url)
+      message.success(`Cập nhật avatar thất bại!`);
+    }
+    if (info.file.status == 'done'){
+      setLoading(false);
+      setImageUrl(info.file.response.image_url)
+      message.success(`Cập nhật avatar thành công!`);
+    }
   };
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -202,17 +213,18 @@ export default function App() {
         <Col span={12}>
           <Form.Item
             label="Thumbnail"
-            name="thumbnail"
+            //name="thumbnail"
             rules={[{ required: true }]}
           >
             <Upload
-              action={"https://blog-nodejs.onrender.com/api/blog/upload"}
+              name="file"
+              action={`https://blog-nodejs.onrender.com/api/blog/upload/${slug}`}
               accept=".png, .jpg, .jpeg"
               beforeUpload={beforeUpload}
               onChange={onChange}
               listType="picture-card"
               showUploadList={false}
-              name="file"
+              multiple={false}
             >
               {imageUrl ? (
                 <img
@@ -220,6 +232,7 @@ export default function App() {
                   alt="avatar"
                   style={{
                     width: "100%",
+                    height: "auto"
                   }}
                 />
               ) : (
