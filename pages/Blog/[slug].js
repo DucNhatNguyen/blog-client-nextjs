@@ -17,12 +17,6 @@ import "dayjs/locale/vi";
 import { Editor } from "@tinymce/tinymce-react";
 import Slugify from "slugify";
 
-const getBase64 = (img, callback) => {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-};
-
 export default function App() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -36,41 +30,40 @@ export default function App() {
   const slug = router.query.slug;
 
   const onFinish = async (values) => {
-    console.log("inputt", { ...values, content,  });
-    // const { thumbnail, ...valuesRest } = values;
+    //console.log("inputt", { ...values, content });
 
-    // await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
-    //   method: "PUT",
-    //   body: JSON.stringify(valuesRest),
-    //   headers: {
-    //     "Access-Control-Allow-Origin": "*",
-    //     "Content-Type": "application/json",
-    //   },
-    // }).then(async (res) => {
-    //   const da = await res.json();
-    //   if (res.status === 200) {
-    //     message.success(`Cập nhật bài viết thành công.`);
-    //     setData(data);
-    //   } else {
-    //     message.error(`Cập nhật bài viết không thành công.`);
-    //   }
-    // });
+    await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
+      method: "PUT",
+      body: JSON.stringify({ ...values, content }),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+    }).then(async (res) => {
+      const da = await res.json();
+      if (res.status === 200) {
+        message.success(`Cập nhật bài viết thành công.`);
+        setData(data);
+      } else {
+        message.error(`Cập nhật bài viết không thành công.`);
+      }
+    });
   };
 
   const onChange = (info) => {
-    console.log(info.file)
-    if (info.file.status == 'uploading'){
+    console.log(info.file);
+    if (info.file.status == "uploading") {
       setLoading(true);
       message.success(`Đang cập nhật avatar...`);
     }
-    if (info.file.status == 'error'){
+    if (info.file.status == "error") {
       setLoading(false);
-      setImageUrl(info.file.response.image_url)
+      setImageUrl(info.file.response.image_url);
       message.success(`Cập nhật avatar thất bại!`);
     }
-    if (info.file.status == 'done'){
+    if (info.file.status == "done") {
       setLoading(false);
-      setImageUrl(info.file.response.image_url)
+      setImageUrl(info.file.response.image_url);
       message.success(`Cập nhật avatar thành công!`);
     }
   };
@@ -141,18 +134,6 @@ export default function App() {
     };
   };
 
-  const requestCloudinaryUpload = (file) => {
-    return fetch("")
-      .then((res) => res.data)
-      .catch((err) => console.log("err upload", err));
-  };
-
-  const handleFileUpload = (e) => {
-    const uploadData = new FormData();
-    uploadData.append("file", e.target.files[0], "file");
-    requestCloudinaryUpload(uploadData);
-  };
-
   useEffect(() => {
     form.setFieldsValue({ slug: Slugify(autoSlug) });
   }, [autoSlug, form]);
@@ -161,7 +142,7 @@ export default function App() {
     <Form
       name="basic"
       layout="vertical"
-      initialValues={{ remember: true }}
+      initialValues={{ remember: true, content: data.content }}
       autoComplete="off"
       style={{ padding: "25px" }}
       onFinish={onFinish}
@@ -197,7 +178,7 @@ export default function App() {
             name="sortdesc"
             rules={[{ required: true }]}
           >
-            <Input.TextArea rows={2} />
+            <Input.TextArea rows={3} />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -232,7 +213,7 @@ export default function App() {
                   alt="avatar"
                   style={{
                     width: "100%",
-                    height: "auto"
+                    height: "auto",
                   }}
                 />
               ) : (
@@ -276,8 +257,6 @@ export default function App() {
               onEditorChange={(content, editor) => {
                 handleChange(parseEditorData(content, editor));
               }}
-              textareaName="content"
-              value={content}
             />
           </Form.Item>
         </Col>

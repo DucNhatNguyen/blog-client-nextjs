@@ -13,12 +13,12 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const items = [
   {
-    label: <Link href="/Blog">Blogs</Link>,
+    label: <Link href="/blog">Blogs</Link>,
     key: "1",
     icon: <DashboardOutlined />,
   },
   {
-    label: <Link href="/Category">Chuyên mục</Link>,
+    label: <Link href="/category">Chuyên mục</Link>,
     key: "2",
     icon: <AppstoreOutlined />,
   },
