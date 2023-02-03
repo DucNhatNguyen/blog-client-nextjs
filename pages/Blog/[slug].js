@@ -30,8 +30,7 @@ export default function App() {
   const slug = router.query.slug;
 
   const onFinish = async (values) => {
-    //console.log("inputt", { ...values, content });
-
+    console.log(JSON.stringify({ ...values, content }))
     await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
       method: "PUT",
       body: JSON.stringify({ ...values, content }),
@@ -114,6 +113,8 @@ export default function App() {
         const da = await res.json();
         form.setFieldsValue({ ...da });
         setData({ ...da });
+        setImageUrl(da.thumbnail)
+        setContent(da.content)
       }
     );
   }, [form, slug]);
@@ -126,6 +127,10 @@ export default function App() {
   const parseEditorData = (content, editor) => {
     const { targetElm } = editor;
     const { name } = targetElm;
+    console.log({
+      name,
+      value: content,
+    })
     return {
       target: {
         name,
@@ -213,7 +218,7 @@ export default function App() {
                   alt="avatar"
                   style={{
                     width: "100%",
-                    height: "auto",
+                    height: "100%",
                   }}
                 />
               ) : (
@@ -249,7 +254,7 @@ export default function App() {
         <Col span={24}>
           <Form.Item
             label="Nội dung"
-            name="content"
+            //name="content"
             rules={[{ required: true }]}
           >
             <Editor
@@ -257,6 +262,7 @@ export default function App() {
               onEditorChange={(content, editor) => {
                 handleChange(parseEditorData(content, editor));
               }}
+              value={content}
             />
           </Form.Item>
         </Col>

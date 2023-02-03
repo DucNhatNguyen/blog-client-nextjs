@@ -72,7 +72,7 @@ const columns = [
     width: 100,
     render: (t, r) => (
       <div style={{ textAlign: "center" }}>
-        <Link href={`/blog/${r.slug}`}>
+        <Link href={`/Blog/${r.slug}`}>
           <EditOutlined />
         </Link>
       </div>
@@ -105,7 +105,7 @@ export default function App() {
         type="primary"
         danger
         style={{ float: "right", margin: "15px 50px" }}
-        href="/blog/create"
+        href="/Blog/create"
       >
         Add
       </Button>
