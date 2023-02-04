@@ -20,7 +20,7 @@ import Slugify from "slugify";
 export default function App() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState();
+  const [thumbnail, setImageUrl] = useState();
   const [data, setData] = useState({});
   const [childCate, setChildCate] = useState([]);
   const [content, setContent] = useState("");
@@ -30,10 +30,10 @@ export default function App() {
   const slug = router.query.slug;
 
   const onFinish = async (values) => {
-    console.log(JSON.stringify({ ...values, content }))
+    console.log({ ...values, content });
     await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
       method: "PUT",
-      body: JSON.stringify({ ...values, content }),
+      body: JSON.stringify({ ...values, content, thumbnail }),
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
@@ -50,20 +50,19 @@ export default function App() {
   };
 
   const onChange = (info) => {
-    console.log(info.file);
     if (info.file.status == "uploading") {
       setLoading(true);
-      message.success(`Đang cập nhật avatar...`);
+      message.success(`Đang tải file...`);
     }
     if (info.file.status == "error") {
       setLoading(false);
       setImageUrl(info.file.response.image_url);
-      message.success(`Cập nhật avatar thất bại!`);
+      message.success(`Tải file thất bại!`);
     }
     if (info.file.status == "done") {
       setLoading(false);
       setImageUrl(info.file.response.image_url);
-      message.success(`Cập nhật avatar thành công!`);
+      //message.success(`Cập nhật avatar thành công!`);
     }
   };
   const beforeUpload = (file) => {
@@ -113,8 +112,8 @@ export default function App() {
         const da = await res.json();
         form.setFieldsValue({ ...da });
         setData({ ...da });
-        setImageUrl(da.thumbnail)
-        setContent(da.content)
+        setImageUrl(da.thumbnail);
+        setContent(da.content);
       }
     );
   }, [form, slug]);
@@ -130,13 +129,31 @@ export default function App() {
     console.log({
       name,
       value: content,
-    })
+    });
     return {
       target: {
         name,
         value: content,
       },
     };
+  };
+
+  const handleChangeStatus = async (value) => {
+    await fetch(`https://blog-nodejs.onrender.com/api/blog/change-status/${slug}`, {
+      method: "POST",
+      body: JSON.stringify({ status: value }),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+    }).then(async (res) => {
+      //const da = await res.json();
+      if (res.status === 200) {
+        message.success(`Cập nhật trạng thái thành công!.`);
+      } else {
+        message.error(`Có lỗi xãy ra!`);
+      }
+    });
   };
 
   useEffect(() => {
@@ -193,18 +210,19 @@ export default function App() {
                 { value: 1, label: "Hoạt động" },
                 { value: 2, label: "Tạm ẩn" },
               ]}
+              onChange={(value) => handleChangeStatus(value)}
             />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item
             label="Thumbnail"
-            //name="thumbnail"
+            name="thumbnail"
             rules={[{ required: true }]}
           >
             <Upload
               name="file"
-              action={`https://blog-nodejs.onrender.com/api/blog/upload/${slug}`}
+              action={`https://blog-nodejs.onrender.com/api/blog/upload`}
               accept=".png, .jpg, .jpeg"
               beforeUpload={beforeUpload}
               onChange={onChange}
@@ -212,9 +230,9 @@ export default function App() {
               showUploadList={false}
               multiple={false}
             >
-              {imageUrl ? (
+              {thumbnail ? (
                 <img
-                  src={imageUrl}
+                  src={thumbnail}
                   alt="avatar"
                   style={{
                     width: "100%",
