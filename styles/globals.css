@@ -129,6 +129,7 @@ a {
   overflow: hidden;
   margin: 0 auto;
   border-radius: 12px;
+  height: 550px;
 }
 #login-form {
   flex: 1 0 100%;

@@ -45,7 +45,6 @@ export default function Category() {
               showModal(r.id);
             }}
           />
-
           <Popconfirm
             title="Xóa chuyên mục"
             description={`Bạn có chắc muốn xóa chuyên mục: ${r.title}`}
