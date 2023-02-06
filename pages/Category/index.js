@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Head from "next/head";
 import { Table, Button, Popconfirm, message, Form } from "antd";
 import Link from "next/link";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import PopupCate from "./PopupCate";
 import PopupCreate from "./PopupCreate";
+import { AppContext } from "../../context/AppContext";
 
 export default function Category() {
+  const { isLoginState, setIsLoginState } = useContext(AppContext);
   const [data, setData] = useState();
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -94,6 +96,7 @@ export default function Category() {
   };
 
   useEffect(() => {
+    console.log("login statee ", isLoginState);
     fetchData(1);
     fetchCateParents();
   }, []);

@@ -1,12 +1,38 @@
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import React, { useContext, useState } from "react";
 import { Input, Button, Checkbox, message, Form } from "antd";
-import Link from "next/link";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { AppContext } from "../../context/AppContext";
+import { setAccessToken } from "../../utils/authority.js";
+import { useRouter } from "next/router";
 
 export default function Login() {
+  const router = useRouter();
+  const { isLoginState, setIsLoginState } = useContext(AppContext);
   const [isLoginForm, setIsLoginForm] = useState(true);
-  const onFinish = (values) => {
+
+  const handleLogin = (values) => {
+    console.log("submit", values);
+    fetch(`https://blog-nodejs.onrender.com/api/auth/sign-in`, {
+      method: "POST",
+      body: JSON.stringify(values),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+    }).then(async (res) => {
+      const dt = await res.json();
+      console.log("loggginnn", !!dt.data);
+      if (!!dt.data) {
+        setIsLoginState(true);
+        setAccessToken(dt.data.accessToken);
+        router.push("/Category");
+      } else {
+        setIsLoginState(false);
+      }
+    });
+  };
+
+  const handleSignUp = (values) => {
     console.log("submit", values);
   };
 
@@ -27,7 +53,7 @@ export default function Login() {
           <Form
             name="login-form"
             initialValues={{ remember: false }}
-            onFinish={onFinish}
+            onFinish={handleSignUp}
             onFinishFailed={onFinishFailed}
           >
             <p className="form-title">Đăng ký</p>
@@ -80,7 +106,7 @@ export default function Login() {
           <Form
             name="login-form"
             initialValues={{ remember: true }}
-            onFinish={onFinish}
+            onFinish={handleLogin}
             onFinishFailed={onFinishFailed}
           >
             <p className="form-title">Đăng nhập</p>
