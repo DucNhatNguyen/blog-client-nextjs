@@ -16,6 +16,7 @@ import moment from "moment";
 import "dayjs/locale/vi";
 import { Editor } from "@tinymce/tinymce-react";
 import Slugify from "slugify";
+import { useFetchGet } from "../../hooks/useFetch";
 
 export default function App() {
   const router = useRouter();
@@ -107,15 +108,22 @@ export default function App() {
     //get child cates
     fetchChildCates();
 
-    fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`).then(
-      async (res) => {
-        const da = await res.json();
-        form.setFieldsValue({ ...da });
-        setData({ ...da });
-        setImageUrl(da.thumbnail);
-        setContent(da.content);
+    async function fetchData() {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { statusCode, response } = await useFetchGet(
+        `https://blog-nodejs.onrender.com/api/blog/${slug}`
+      );
+      if (statusCode == 200) {
+        form.setFieldsValue(response);
+        setData(response);
+        setImageUrl(response.thumbnail);
+        setContent(response.content);
+      } else {
+        message.error(`Có lỗi xãy ra!`);
       }
-    );
+    }
+
+    fetchData();
   }, [form, slug]);
 
   const handleChange = (e) => {
@@ -139,14 +147,17 @@ export default function App() {
   };
 
   const handleChangeStatus = async (value) => {
-    await fetch(`https://blog-nodejs.onrender.com/api/blog/change-status/${slug}`, {
-      method: "POST",
-      body: JSON.stringify({ status: value }),
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-    }).then(async (res) => {
+    await fetch(
+      `https://blog-nodejs.onrender.com/api/blog/change-status/${slug}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ status: value }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+      }
+    ).then(async (res) => {
       //const da = await res.json();
       if (res.status === 200) {
         message.success(`Cập nhật trạng thái thành công!.`);

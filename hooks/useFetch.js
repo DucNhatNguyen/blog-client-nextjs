@@ -1,20 +1,30 @@
-import { getAccessToken } from '../utils/authority.js'
-
-const ACCESS_TOKEN_KEY = "lGVSWkkXf8AMCWs8NxIsFHFjIKBrZzUq";
+import { getAccessToken } from "../utils/authority.js";
 
 export const useFetchGet = (url) => {
-    console.log(process.env.ACCESS_TOKEN_KEY)
-    return fetch(url,
-        {
-            headers: {Authorization: `Bearer ${getAccessToken(process.env.ACCESS_TOKEN_KEY)}`}
-        })
-        .then(async (res) => {
-            const {data, total} = await res.json()
-            return { data, total, error: null}
-        })
-        .catch(err => {
-            return { data: null, total: 0, error: err}
-        })
-}
+  return fetch(url, {
+    headers: {
+      Authorization: `Bearer ${getAccessToken(process.env.ACCESS_TOKEN_KEY)}`,
+    },
+  })
+    .then(async (res) => {
+      const resState = await res;
+      const resData = await res.json();
+      if (resState.status != 200) {
+        return {
+          response: resState.status,
+          msg: resData,
+          data: null,
+        };
+      } else {
+        return {
+          statusCode: resState.status,
+          response: resData,
+        };
+      }
+    })
+    .catch((err) => {
+      return { data: null, error: err };
+    });
+};
 
-export default {useFetchGet}
+export default { useFetchGet };

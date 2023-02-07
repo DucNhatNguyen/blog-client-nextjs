@@ -6,7 +6,7 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import PopupCate from "./PopupCate";
 import PopupCreate from "./PopupCreate";
 import { AppContext } from "../../context/AppContext";
-import {useFetchGet}  from '../../hooks/useFetch'
+import { useFetchGet } from "../../hooks/useFetch";
 
 export default function Category() {
   const { isLoginState, setIsLoginState } = useContext(AppContext);
@@ -67,14 +67,18 @@ export default function Category() {
     },
   ];
 
-  const fetchData =  async (page) => {
+  const fetchData = async (page) => {
     setLoading(true);
 
-    const { data, total, error } = await useFetchGet(`https://blog-nodejs.onrender.com/api/category?page=${page}&pagesize=10`);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { data, total, error } = await useFetchGet(
+      `https://blog-nodejs.onrender.com/api/category?page=${page}&pagesize=10`
+    );
+
     if (!error) {
       setData(data);
-        setTotal(total);
-        setLoading(false);
+      setTotal(total);
+      setLoading(false);
     } else {
       message.error(`Có lỗi xãy ra!`);
     }

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/router";
-import { Table, Image, Button } from "antd";
+import { Table, Image, Button, message } from "antd";
 import Link from "next/link";
 import { EditOutlined } from "@ant-design/icons";
-import {useFetchGet}  from '../../hooks/useFetch'
+import { useFetchGet } from "../../hooks/useFetch";
+import { AppContext } from "../../context/AppContext";
 
 const columns = [
   {
@@ -82,16 +83,22 @@ const columns = [
 ];
 
 export default function App() {
+  const router = useRouter();
+  const { isLoginState, setIsLoginState } = useContext(AppContext);
   const [data, setData] = useState();
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const fetchData = async (page) => {
     setLoading(true);
-    const { data, total, error } = await useFetchGet(`https://blog-nodejs.onrender.com/api/blog?page=${page}&pagesize=10`);
-    if (!error) {
-      setData(data);
-        setTotal(total);
-        setLoading(false);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { statusCode, response } = await useFetchGet(
+      `https://blog-nodejs.onrender.com/api/blog?page=${page}&pagesize=10`
+    );
+
+    if (statusCode == 200) {
+      setData(response.data);
+      setTotal(response.total);
+      setLoading(false);
     } else {
       message.error(`Có lỗi xãy ra!`);
     }
@@ -106,8 +113,12 @@ export default function App() {
   };
 
   useEffect(() => {
+    console.log("checkloginBlog", isLoginState);
+    if (!isLoginState) {
+      router.push("/Home/login");
+    }
     fetchData(1);
-  }, []);
+  }, [isLoginState, router]);
 
   return (
     <>
