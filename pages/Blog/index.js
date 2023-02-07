@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { Table, Image, Button } from "antd";
 import Link from "next/link";
 import { EditOutlined } from "@ant-design/icons";
+import {useFetchGet}  from '../../hooks/useFetch'
 
 const columns = [
   {
@@ -84,15 +85,24 @@ export default function App() {
   const [data, setData] = useState();
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const fetchData = (page) => {
+  const fetchData = async (page) => {
     setLoading(true);
-    fetch(`https://blog-nodejs.onrender.com/api/blog?page=${page}&pagesize=10`)
-      .then((res) => res.json())
-      .then(({ data, total }) => {
-        setData(data);
+    const { data, total, error } = await useFetchGet(`https://blog-nodejs.onrender.com/api/blog?page=${page}&pagesize=10`);
+    if (!error) {
+      setData(data);
         setTotal(total);
         setLoading(false);
-      });
+    } else {
+      message.error(`Có lỗi xãy ra!`);
+    }
+
+    // fetch(`https://blog-nodejs.onrender.com/api/blog?page=${page}&pagesize=10`)
+    //   .then((res) => res.json())
+    //   .then(({ data, total }) => {
+    //     setData(data);
+    //     setTotal(total);
+    //     setLoading(false);
+    //   });
   };
 
   useEffect(() => {
@@ -120,7 +130,7 @@ export default function App() {
             fetchData(page);
           },
         }}
-        rowKey="uid"
+        rowKey="id"
         scroll={{ x: 1500, y: 300 }}
       />
     </>

@@ -12,23 +12,25 @@ const AppLayout = dynamic(() => import("../components/layout/layout"), {
 export default function App({ Component, pageProps }) {
   const router = useRouter();
   return (
-    <AppProvider>
+
+      <AppProvider>
       {router.pathname == "/Home/login" ||
       router.pathname == "/Home/sign-up" ? (
         <Component {...pageProps} />
       ) : (
-        <AppLayout>
-          <Head>
-            <title>CMS - Blogs</title>
-            <meta charset="utf-8" />
-            <meta
-              name="viewport"
-              content="width=device-width, initial-scale=1"
-            />
-          </Head>
-          <Component {...pageProps} />
-        </AppLayout>
+          <AppLayout>
+            <Head>
+              <title>CMS - Blogs</title>
+              <meta charset="utf-8" />
+              <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1"
+              />
+            </Head>
+            <Component {...pageProps} />
+          </AppLayout>
       )}
     </AppProvider>
+
   );
 }

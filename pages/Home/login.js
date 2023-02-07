@@ -25,7 +25,7 @@ export default function Login() {
       if (!!dt.data) {
         setIsLoginState(true);
         setAccessToken(dt.data.accessToken);
-        router.push("/Category");
+        router.push("/Blog");
       } else {
         setIsLoginState(false);
       }
