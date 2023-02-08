@@ -6,7 +6,7 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import PopupCate from "./PopupCate";
 import PopupCreate from "./PopupCreate";
 import { AppContext } from "../../context/AppContext";
-import { useFetchGet } from "../../hooks/useFetch";
+import { useFetchGet, useEffectAction } from "../../hooks/useFetch";
 
 export default function Category() {
   const { isLoginState, setIsLoginState } = useContext(AppContext);
@@ -71,70 +71,71 @@ export default function Category() {
     setLoading(true);
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { data, total, error } = await useFetchGet(
+    const { statusCode, response } = await useFetchGet(
       `https://blog-nodejs.onrender.com/api/category?page=${page}&pagesize=10`
     );
 
-    if (!error) {
-      setData(data);
-      setTotal(total);
+    if (statusCode == 200) {
+      setData(response.data);
+      setTotal(response.total);
       setLoading(false);
+    } else {
+      message.error(`${statusCode} - Có lỗi xãy ra!`);
+    }
+  };
+
+  const fetchCateParents = async () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { statusCode, response } = await useFetchGet(
+      `https://blog-nodejs.onrender.com/api/category/parent`
+    );
+
+    if (statusCode == 200) {
+      const options = response.data.map((x) => ({
+        value: x.id,
+        label: x.title,
+      }));
+      setParentCate([
+        { value: 0, label: "--Không đặt Chuyên mục cha--" },
+        ...options,
+      ]);
     } else {
       message.error(`Có lỗi xãy ra!`);
     }
   };
 
-  const fetchCateParents = () => {
-    fetch(`https://blog-nodejs.onrender.com/api/category/parent`).then(
-      async (res) => {
-        const da = await res.json();
-        const options = da.data.map((x) => ({
-          value: x.id,
-          label: x.title,
-        }));
-        setParentCate([
-          { value: 0, label: "--Không đặt Chuyên mục cha--" },
-          ...options,
-        ]);
-      }
-    );
-  };
-
   useEffect(() => {
     console.log("login statee ", isLoginState);
+    if (!isLoginState) {
+      router.push("/Home/login");
+    }
     fetchData(1);
     fetchCateParents();
   }, []);
 
   const handleOkModal = async (values, id) => {
     setConfirmModalLoading(true);
-    await fetch(`https://blog-nodejs.onrender.com/api/category/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(values),
-      headers: {
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { statusCode, response } = await useEffectAction(
+      `https://blog-nodejs.onrender.com/api/category/${id}`,
+      "PUT",
+      {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
-    }).then(async (res) => {
-      setOpenModal(false);
-      setConfirmModalLoading(false);
-      fetchData(1);
-      const da = await res.json();
-      if (res.status === 200) {
-        message.success(`Cập nhật thông tin thành công!`);
-      } else {
-        message.error(`Có lỗi xãy ra!`);
-      }
-    });
+      JSON.stringify(values)
+    );
 
-    // console.log("Received values of form: ", values);
-    // setConfirmModalLoading(true);
+    setOpenModal(false);
+    setConfirmModalLoading(false);
+    fetchData(1);
 
-    // setTimeout(() => {
-    //   setOpenModal(false);
-    //   setConfirmModalLoading(false);
-    //   message.success(`Cập nhật thông tin thành công!`);
-    // }, 2000);
+    if (statusCode == 200) {
+      message.success(`Cập nhật thông tin thành công!`);
+    } else {
+      message.error(`Có lỗi xãy ra!`);
+    }
   };
 
   const showModal = (id) => {

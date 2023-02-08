@@ -102,14 +102,6 @@ export default function App() {
     } else {
       message.error(`Có lỗi xãy ra!`);
     }
-
-    // fetch(`https://blog-nodejs.onrender.com/api/blog?page=${page}&pagesize=10`)
-    //   .then((res) => res.json())
-    //   .then(({ data, total }) => {
-    //     setData(data);
-    //     setTotal(total);
-    //     setLoading(false);
-    //   });
   };
 
   useEffect(() => {

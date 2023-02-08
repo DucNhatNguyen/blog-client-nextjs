@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, Modal, Select } from "antd";
+import { useFetchGet } from "../../hooks/useFetch";
 
 export default function PopupCate({
   id,
@@ -12,16 +13,30 @@ export default function PopupCate({
   const [form] = Form.useForm();
   const [data, setData] = useState({});
 
+  const fetchData = async (id) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { statusCode, response } = await useFetchGet(
+      `https://blog-nodejs.onrender.com/api/category/${id}`
+    );
+    if (statusCode == 200) {
+      form.setFieldsValue(response);
+      setData(response);
+    } else {
+      message.error(`Có lỗi xãy ra!`);
+    }
+  };
+
   useEffect(() => {
     if (id == 0) return;
-    fetch(`https://blog-nodejs.onrender.com/api/category/${id}`).then(
-      async (res) => {
-        const da = await res.json();
-        console.log("data", da);
-        form.setFieldsValue({ ...da });
-        setData(da);
-      }
-    ); 
+    fetchData(id);
+    // fetch(`https://blog-nodejs.onrender.com/api/category/${id}`).then(
+    //   async (res) => {
+    //     const da = await res.json();
+    //     console.log("data", da);
+    //     form.setFieldsValue({ ...da });
+    //     setData(da);
+    //   }
+    // );
   }, [form, id]);
 
   return (
