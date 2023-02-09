@@ -1,4 +1,7 @@
-import { getAccessToken } from "../utils/authority.js";
+import { useRouter } from "next/router";
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext.js";
+import { getAccessToken, removeAccessToken } from "../utils/authority.js";
 
 export const useFetchGet = (url) => {
   return fetch(url, {
@@ -9,16 +12,23 @@ export const useFetchGet = (url) => {
     .then(async (res) => {
       const resState = await res;
       const resData = await res.json();
-      if (resState.status != 200) {
+
+      if (resState.status == 401) {
+        removeAccessToken(process.env.ACCESS_TOKEN_KEY);
+        setIsLoginState(false);
+        router.pathname == "/Home/login";
+        return;
+      }
+      if (resState.status == 200) {
+        return {
+          statusCode: resState.status,
+          response: resData,
+        };
+      } else {
         return {
           response: null,
           msg: resData.message,
           statusCode: resState.status,
-        };
-      } else {
-        return {
-          statusCode: resState.status,
-          response: resData,
         };
       }
     })
@@ -62,6 +72,18 @@ export const useEffectAction = (url, method, headers, body) => {
     .catch((err) => {
       return { data: null, error: err };
     });
+};
+
+const checkLoginState = (statusCode) => {
+  const [isLoginState, setIsLoginState] = useContext(AppContext);
+  const router = useRouter();
+
+  if (statusCode == 401) {
+    removeAccessToken(process.env.ACCESS_TOKEN_KEY);
+    setIsLoginState(false);
+    router.pathname == "/Home/login";
+    //return;
+  }
 };
 
 export default { useFetchGet, useEffectAction };

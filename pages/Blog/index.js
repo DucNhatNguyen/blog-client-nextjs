@@ -105,12 +105,11 @@ export default function App() {
   };
 
   useEffect(() => {
-    console.log("checkloginBlog", isLoginState);
     if (!isLoginState) {
       router.push("/Home/login");
     }
     fetchData(1);
-  }, [isLoginState, router]);
+  }, []);
 
   return (
     <>
