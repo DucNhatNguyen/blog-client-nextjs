@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -11,6 +11,7 @@ const AppLayout = dynamic(() => import("../components/layout/layout"), {
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
+
   return (
     <AppProvider>
       {router.pathname == "/Home/login" ||

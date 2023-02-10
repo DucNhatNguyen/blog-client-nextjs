@@ -40,3 +40,12 @@ export const getUserInfoByToken = () => {
   }
   return null;
 };
+
+export const checkIsLoggedIn = () => {
+  const decode = jwtDecode(getAccessToken());
+  if (new Date(decode.exp * 1000) > new Date(Date.now())) {
+    return true;
+  } else {
+    return false;
+  }
+};

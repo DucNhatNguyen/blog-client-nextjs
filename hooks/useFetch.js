@@ -1,24 +1,15 @@
-import { useRouter } from "next/router";
-import { useContext } from "react";
-import { AppContext } from "../context/AppContext.js";
-import { getAccessToken, removeAccessToken } from "../utils/authority.js";
+import { getAccessToken } from "../utils/authority.js";
 
 export const useFetchGet = (url) => {
   return fetch(url, {
     headers: {
-      Authorization: `Bearer ${getAccessToken(process.env.ACCESS_TOKEN_KEY)}`,
+      Authorization: `Bearer ${getAccessToken()}`,
     },
   })
     .then(async (res) => {
       const resState = await res;
       const resData = await res.json();
 
-      if (resState.status == 401) {
-        removeAccessToken(process.env.ACCESS_TOKEN_KEY);
-        setIsLoginState(false);
-        router.pathname == "/Home/login";
-        return;
-      }
       if (resState.status == 200) {
         return {
           statusCode: resState.status,
@@ -72,18 +63,6 @@ export const useEffectAction = (url, method, headers, body) => {
     .catch((err) => {
       return { data: null, error: err };
     });
-};
-
-const checkLoginState = (statusCode) => {
-  const [isLoginState, setIsLoginState] = useContext(AppContext);
-  const router = useRouter();
-
-  if (statusCode == 401) {
-    removeAccessToken(process.env.ACCESS_TOKEN_KEY);
-    setIsLoginState(false);
-    router.pathname == "/Home/login";
-    //return;
-  }
 };
 
 export default { useFetchGet, useEffectAction };

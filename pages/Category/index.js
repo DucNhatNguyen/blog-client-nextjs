@@ -7,9 +7,11 @@ import PopupCate from "./PopupCate";
 import PopupCreate from "./PopupCreate";
 import { AppContext } from "../../context/AppContext";
 import { useFetchGet, useEffectAction } from "../../hooks/useFetch";
+import { useRouter } from "next/router";
+import { checkIsLoggedIn } from "../../utils/authority.js";
 
 export default function Category() {
-  const { isLoginState, setIsLoginState } = useContext(AppContext);
+  const { isLoginState, setIsLoginState, cateParent } = useContext(AppContext);
   const [data, setData] = useState();
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -18,7 +20,7 @@ export default function Category() {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [selectedId, setSelectedId] = useState(0);
   const [parentCate, setParentCate] = useState([]);
-
+  const router = useRouter();
   const columns = [
     {
       title: "Title",
@@ -105,10 +107,6 @@ export default function Category() {
   };
 
   useEffect(() => {
-    console.log("login statee ", isLoginState);
-    if (!isLoginState) {
-      router.push("/Home/login");
-    }
     fetchData(1);
     fetchCateParents();
   }, []);
