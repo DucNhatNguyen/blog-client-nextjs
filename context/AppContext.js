@@ -9,9 +9,6 @@ export const AppProvider = ({ children }) => {
   const [isLoginState, setIsLoginState] = useState(false);
 
   useEffect(() => {
-    if (!checkIsLoggedIn()) {
-      router.push("/Home/login");
-    }
     setIsLoginState(isLoggedIn());
   }, []);
 

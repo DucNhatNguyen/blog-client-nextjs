@@ -4,7 +4,7 @@ import { AppContext } from "../context/AppContext.js";
 
 export default function Home() {
   const redirectTo = "/Home/login";
-  console.log("cho nay vao truoc ne");
+  if (typeof window === "undefined") return null;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const router = useRouter();

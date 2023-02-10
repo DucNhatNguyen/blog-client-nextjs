@@ -1,4 +1,5 @@
-import { getAccessToken } from "../utils/authority.js";
+import { getAccessToken, removeAccessToken } from "../utils/authority.js";
+import { message } from "antd";
 
 export const useFetchGet = (url) => {
   return fetch(url, {
@@ -9,6 +10,12 @@ export const useFetchGet = (url) => {
     .then(async (res) => {
       const resState = await res;
       const resData = await res.json();
+
+      if (resState.status == 401) {
+        removeAccessToken();
+        message.error("Hết phiên đăng nhập! vui lòng đăng nhập lại.");
+        window.location.href = "/Home/login";
+      }
 
       if (resState.status == 200) {
         return {

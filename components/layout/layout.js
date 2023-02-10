@@ -3,9 +3,10 @@ import React from "react";
 import { Layout, Menu, theme, Button } from "antd";
 import Link from "next/link";
 import {
-  AppstoreOutlined,
+  TagsOutlined,
   DashboardOutlined,
-  SettingOutlined,
+  SnippetsOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import BreadCrumb from "../BreadCrums";
 
@@ -13,29 +14,34 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const items = [
   {
-    label: <Link href="/Blog">Blogs</Link>,
+    label: <Link href="/Dashboard">Dashboard</Link>,
     key: "1",
     icon: <DashboardOutlined />,
   },
   {
-    label: <Link href="/Category">Chuyên mục</Link>,
-    key: "2",
-    icon: <AppstoreOutlined />,
+    label: <Link href="/Blog">Blogs</Link>,
+    key: "6",
+    icon: <BookOutlined />,
   },
   {
-    label: "Navigation Three - Submenu",
+    label: "Chuyên mục",
     key: "3",
-    icon: <SettingOutlined />,
+    icon: <SnippetsOutlined />,
     children: [
       {
-        label: <Link href="/menu3/submenu1">Submenu 1</Link>,
+        label: <Link href="/Category">Quản lý</Link>,
         key: "4",
       },
       {
-        label: "Option 2",
+        label: <Link href="/Category/order">Sắp xếp</Link>,
         key: "5",
       },
     ],
+  },
+  {
+    label: <Link href="/Tag">Tag</Link>,
+    key: "2",
+    icon: <TagsOutlined />,
   },
 ];
 
