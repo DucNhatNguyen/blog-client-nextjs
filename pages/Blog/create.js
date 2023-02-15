@@ -15,6 +15,8 @@ import moment from "moment";
 import "dayjs/locale/vi";
 import { Editor } from "@tinymce/tinymce-react";
 import Slugify from "slugify";
+import { useFetchGet } from "../../hooks/useFetch";
+import { getAccessToken, removeAccessToken } from "../../utils/authority.js";
 
 export default function App() {
   const [loading, setLoading] = useState(false);
@@ -32,6 +34,7 @@ export default function App() {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
+        Authorization: `Bearer ${getAccessToken(process.env.ACCESS_TOKEN_KEY)}`,
       },
     }).then(async (res) => {
       const da = await res.json();
@@ -85,17 +88,16 @@ export default function App() {
     </div>
   );
 
-  const fetchChildCates = () => {
-    fetch(`https://blog-nodejs.onrender.com/api/category/child`).then(
-      async (res) => {
-        const da = await res.json();
-        const options = da.data.map((x) => ({
-          value: x.id,
-          label: x.title,
-        }));
-        setChildCate([{ value: 0, label: "--Chọn chuyên mục--" }, ...options]);
-      }
+  const fetchChildCates = async () => {
+    const { statusCode, response } = await useFetchGet(
+      `https://blog-nodejs.onrender.com/api/category/child`
     );
+
+    const options = response.data.map((x) => ({
+      value: x.id,
+      label: x.title,
+    }));
+    setChildCate([{ value: 0, label: "--Chọn chuyên mục--" }, ...options]);
   };
 
   useEffect(() => {
