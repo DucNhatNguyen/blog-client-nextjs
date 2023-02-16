@@ -133,7 +133,7 @@ export default function App() {
           },
         }}
         rowKey="id"
-        scroll={{ x: 1500, y: 300 }}
+        scroll={{ x: 1500, y: "auto" }}
       />
     </>
   );
