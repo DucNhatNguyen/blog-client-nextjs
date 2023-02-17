@@ -17,8 +17,10 @@ import { Editor } from "@tinymce/tinymce-react";
 import Slugify from "slugify";
 import { getAccessToken, removeAccessToken } from "../../utils/authority.js";
 import { useFetchGet, useEffectAction } from "../../hooks/useFetch";
+import { useRouter } from "next/router";
 
 export default function App() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [thumbnail, setImageUrl] = useState();
   const [childCate, setChildCate] = useState([]);
@@ -27,9 +29,9 @@ export default function App() {
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    console.log({ ...values, content, thumbnail });
     const { statusCode, response } = await useEffectAction(
-      `https://blog-nodejs.onrender.com/api/blog`,
+      // `https://blog-nodejs.onrender.com/api/blog`,
+      `http://localhost:8080/api/blog`,
       "POST",
       {
         "Access-Control-Allow-Origin": "*",
@@ -40,28 +42,10 @@ export default function App() {
     console.log({ statusCode, response });
     if (statusCode === 200) {
       message.success(`Tạo bài viết thành công.`);
-      //setData(response);
+      router.push("/Blog");
     } else {
       message.error(`Có lỗi xảy ra!`);
     }
-
-    // await fetch(`https://blog-nodejs.onrender.com/api/blog`, {
-    //   method: "POST",
-    //   body: JSON.stringify({ ...values, content, thumbnail }),
-    //   headers: {
-    //     "Access-Control-Allow-Origin": "*",
-    //     "Content-Type": "application/json",
-    //     Authorization: `Bearer ${getAccessToken(process.env.ACCESS_TOKEN_KEY)}`,
-    //   },
-    // }).then(async (res) => {
-    //   const da = await res.json();
-    //   if (res.status === 200) {
-    //     message.success(`Tạo bài viết thành công.`);
-    //     setData(data);
-    //   } else {
-    //     message.error(`Có lỗi xảy ra!`);
-    //   }
-    // });
   };
 
   const onChange = (info) => {

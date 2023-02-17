@@ -29,14 +29,6 @@ export default function PopupCate({
   useEffect(() => {
     if (id == 0) return;
     fetchData(id);
-    // fetch(`https://blog-nodejs.onrender.com/api/category/${id}`).then(
-    //   async (res) => {
-    //     const da = await res.json();
-    //     console.log("data", da);
-    //     form.setFieldsValue({ ...da });
-    //     setData(da);
-    //   }
-    // );
   }, [form, id]);
 
   return (

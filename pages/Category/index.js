@@ -140,38 +140,55 @@ export default function Category() {
 
   const handleCreate = async (values) => {
     setConfirmModalLoading(true);
-    await fetch(`https://blog-nodejs.onrender.com/api/category`, {
-      method: "POST",
-      body: JSON.stringify(values),
-      headers: {
+
+    const { statusCode, response } = await useEffectAction(
+      `https://blog-nodejs.onrender.com/api/category`,
+      "POST",
+      {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
-    }).then(async (res) => {
-      setOpenCreateModal(false);
-      setConfirmModalLoading(false);
-      fetchData(1);
-      const da = await res.json();
-      if (res.status === 200) {
-        message.success(`Tạo chuyên mục thành công!.`);
-      } else {
-        message.error(`Có lỗi xãy ra!`);
-      }
-    });
+      JSON.stringify(values)
+    );
+
+    setOpenCreateModal(false);
+    setConfirmModalLoading(false);
+    fetchData(1);
+
+    if (statusCode === 200) {
+      message.success(`Tạo chuyên mục thành công!.`);
+    } else {
+      message.error(`Có lỗi xãy ra!`);
+    }
   };
 
   const handleDelete = async (id) => {
-    await fetch(`https://blog-nodejs.onrender.com/api/category/${id}`, {
-      method: "DELETE",
-    }).then(async (res) => {
-      fetchData(1);
-      const da = await res.json();
-      if (res.status === 200) {
-        message.success(`Xóa chuyên mục thành công!.`);
-      } else {
-        message.error(`Có lỗi xãy ra!`);
+    const { statusCode, response } = await useEffectAction(
+      `https://blog-nodejs.onrender.com/api/category/${id}`,
+      "DELETE",
+      {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
       }
-    });
+    );
+    fetchData(1);
+    if (statusCode === 200) {
+      message.success(`Xóa chuyên mục thành công!.`);
+    } else {
+      message.error(`Có lỗi xãy ra!`);
+    }
+
+    // await fetch(`https://blog-nodejs.onrender.com/api/category/${id}`, {
+    //   method: "DELETE",
+    // }).then(async (res) => {
+    //   fetchData(1);
+    //   const da = await res.json();
+    //   if (res.status === 200) {
+    //     message.success(`Xóa chuyên mục thành công!.`);
+    //   } else {
+    //     message.error(`Có lỗi xãy ra!`);
+    //   }
+    // });
   };
 
   return (

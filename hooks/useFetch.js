@@ -54,16 +54,23 @@ export const useEffectAction = (url, method, headers, body) => {
     .then(async (res) => {
       const resState = await res;
       const resData = await res.json();
-      if (resState.status != 200) {
+
+      if (resState.status == 401) {
+        removeAccessToken();
+        message.error("Hết phiên đăng nhập! vui lòng đăng nhập lại.");
+        window.location.href = "/Home/login";
+      }
+
+      if (resState.status == 200) {
+        return {
+          statusCode: resState.status,
+          response: resData,
+        };
+      } else {
         return {
           response: null,
           msg: resData.message,
           statusCode: resState.status,
-        };
-      } else {
-        return {
-          statusCode: resState.status,
-          response: resData,
         };
       }
     })

@@ -16,7 +16,7 @@ import moment from "moment";
 import "dayjs/locale/vi";
 import { Editor } from "@tinymce/tinymce-react";
 import Slugify from "slugify";
-import { useFetchGet } from "../../hooks/useFetch";
+import { useFetchGet, useEffectAction } from "../../hooks/useFetch";
 
 export default function App() {
   const router = useRouter();
@@ -32,22 +32,38 @@ export default function App() {
 
   const onFinish = async (values) => {
     console.log({ ...values, content });
-    await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
-      method: "PUT",
-      body: JSON.stringify({ ...values, content, thumbnail }),
-      headers: {
+    const { statusCode, response } = await useEffectAction(
+      `https://blog-nodejs.onrender.com/api/blog/${slug}`,
+      "PUT",
+      {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
-    }).then(async (res) => {
-      const da = await res.json();
-      if (res.status === 200) {
-        message.success(`Cập nhật bài viết thành công.`);
-        setData(data);
-      } else {
-        message.error(`Cập nhật bài viết không thành công.`);
-      }
-    });
+      JSON.stringify({ ...values, content, thumbnail })
+    );
+
+    if (statusCode === 200) {
+      message.success(`Cập nhật bài viết thành công.`);
+    } else {
+      message.error(`Cập nhật bài viết không thành công.`);
+    }
+
+    // await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
+    //   method: "PUT",
+    //   body: JSON.stringify({ ...values, content, thumbnail }),
+    //   headers: {
+    //     "Access-Control-Allow-Origin": "*",
+    //     "Content-Type": "application/json",
+    //   },
+    // }).then(async (res) => {
+    //   const da = await res.json();
+    //   if (res.status === 200) {
+    //     message.success(`Cập nhật bài viết thành công.`);
+    //     setData(data);
+    //   } else {
+    //     message.error(`Cập nhật bài viết không thành công.`);
+    //   }
+    // });
   };
 
   const onChange = (info) => {
@@ -91,17 +107,16 @@ export default function App() {
     </div>
   );
 
-  const fetchChildCates = () => {
-    fetch(`https://blog-nodejs.onrender.com/api/category/child`).then(
-      async (res) => {
-        const da = await res.json();
-        const options = da.data.map((x) => ({
-          value: x.id,
-          label: x.title,
-        }));
-        setChildCate([{ value: 0, label: "--Chọn chuyên mục--" }, ...options]);
-      }
+  const fetchChildCates = async () => {
+    const { statusCode, response } = await useFetchGet(
+      `https://blog-nodejs.onrender.com/api/category/child`
     );
+
+    const options = response.data.map((x) => ({
+      value: x.id,
+      label: x.title,
+    }));
+    setChildCate([{ value: 0, label: "--Chọn chuyên mục--" }, ...options]);
   };
 
   useEffect(() => {
@@ -147,24 +162,20 @@ export default function App() {
   };
 
   const handleChangeStatus = async (value) => {
-    await fetch(
+    const { statusCode, response } = await useEffectAction(
       `https://blog-nodejs.onrender.com/api/blog/change-status/${slug}`,
+      "POST",
       {
-        method: "POST",
-        body: JSON.stringify({ status: value }),
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-        },
-      }
-    ).then(async (res) => {
-      //const da = await res.json();
-      if (res.status === 200) {
-        message.success(`Cập nhật trạng thái thành công!.`);
-      } else {
-        message.error(`Có lỗi xãy ra!`);
-      }
-    });
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      JSON.stringify({ status: value })
+    );
+    if (statusCode === 200) {
+      message.success(`Cập nhật trạng thái thành công!.`);
+    } else {
+      message.error(`Có lỗi xãy ra!`);
+    }
   };
 
   useEffect(() => {
@@ -269,7 +280,7 @@ export default function App() {
               moment(onChange).format("DD/MM/YYYY")
             }
             getValueProps={(i) => ({ value: moment(i) })}
-            rules={[{ required: true }]}
+            //rules={[{ required: true }]}
           >
             <DatePicker
               format="DD/MM/YYYY"
