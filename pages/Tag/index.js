@@ -9,7 +9,7 @@ import { AppContext } from "../../context/AppContext";
 import { useFetchGet, useEffectAction } from "../../hooks/useFetch";
 
 export default function Category() {
-  const { isLoginState, setIsLoginState, cateParent } = useContext(AppContext);
+  const { setHeader } = useContext(AppContext);
   const [data, setData] = useState();
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -65,7 +65,7 @@ export default function Category() {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useFetchGet(
-      `https://blog-nodejs.onrender.com/api/tag?page=${page}&pagesize=10`
+      `tag?page=${page}&pagesize=10`
     );
 
     if (statusCode == 200) {
@@ -78,6 +78,7 @@ export default function Category() {
   };
 
   useEffect(() => {
+    setHeader("Tag");
     fetchData(1);
   }, []);
 
@@ -86,7 +87,7 @@ export default function Category() {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useEffectAction(
-      `https://blog-nodejs.onrender.com/api/tag/${id}`,
+      `tag/${id}`,
       "PUT",
       {
         "Access-Control-Allow-Origin": "*",
@@ -113,7 +114,7 @@ export default function Category() {
 
   const handleCreate = async (values) => {
     setConfirmModalLoading(true);
-    await fetch(`https://blog-nodejs.onrender.com/api/tag`, {
+    await fetch(`tag`, {
       method: "POST",
       body: JSON.stringify(values),
       headers: {
@@ -134,7 +135,7 @@ export default function Category() {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`https://blog-nodejs.onrender.com/api/tag/${id}`, {
+    await fetch(`tag/${id}`, {
       method: "DELETE",
     }).then(async (res) => {
       fetchData(1);

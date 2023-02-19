@@ -2,7 +2,8 @@ import { getAccessToken, removeAccessToken } from "../utils/authority.js";
 import { message } from "antd";
 
 export const useFetchGet = (url) => {
-  return fetch(url, {
+  console.log("root path", process.env.ROOT_NODE_API);
+  return fetch(`${process.env.ROOT_NODE_API + url}`, {
     headers: {
       Authorization: `Bearer ${getAccessToken()}`,
     },
@@ -43,7 +44,7 @@ export const useFetchGet = (url) => {
   body: chuỗi param sau khi convert json -> string [JSON.stringify(...)]
 */
 export const useEffectAction = (url, method, headers, body) => {
-  return fetch(url, {
+  return fetch(`${process.env.ROOT_NODE_API + url}`, {
     headers: {
       ...headers,
       Authorization: `Bearer ${getAccessToken(process.env.ACCESS_TOKEN_KEY)}`,

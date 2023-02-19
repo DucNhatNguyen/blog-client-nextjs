@@ -9,7 +9,7 @@ import { AppContext } from "../../context/AppContext";
 import { useFetchGet, useEffectAction } from "../../hooks/useFetch";
 
 export default function Category() {
-  const { isLoginState, setIsLoginState, cateParent } = useContext(AppContext);
+  const { isLoginState, setIsLoginState, setHeader } = useContext(AppContext);
   const [data, setData] = useState();
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -71,7 +71,7 @@ export default function Category() {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useFetchGet(
-      `https://blog-nodejs.onrender.com/api/category?page=${page}&pagesize=10`
+      `category?page=${page}&pagesize=10`
     );
 
     if (statusCode == 200) {
@@ -85,9 +85,7 @@ export default function Category() {
 
   const fetchCateParents = async () => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { statusCode, response } = await useFetchGet(
-      `https://blog-nodejs.onrender.com/api/category/parent`
-    );
+    const { statusCode, response } = await useFetchGet(`category/parent`);
 
     if (statusCode == 200) {
       const options = response.data.map((x) => ({
@@ -104,6 +102,7 @@ export default function Category() {
   };
 
   useEffect(() => {
+    setHeader("Chuyên mục");
     fetchData(1);
     fetchCateParents();
   }, []);
@@ -113,7 +112,7 @@ export default function Category() {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useEffectAction(
-      `https://blog-nodejs.onrender.com/api/category/${id}`,
+      `category/${id}`,
       "PUT",
       {
         "Access-Control-Allow-Origin": "*",
@@ -141,8 +140,9 @@ export default function Category() {
   const handleCreate = async (values) => {
     setConfirmModalLoading(true);
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useEffectAction(
-      `https://blog-nodejs.onrender.com/api/category`,
+      `category`,
       "POST",
       {
         "Access-Control-Allow-Origin": "*",
@@ -163,8 +163,9 @@ export default function Category() {
   };
 
   const handleDelete = async (id) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useEffectAction(
-      `https://blog-nodejs.onrender.com/api/category/${id}`,
+      `category/${id}`,
       "DELETE",
       {
         "Access-Control-Allow-Origin": "*",
@@ -177,18 +178,6 @@ export default function Category() {
     } else {
       message.error(`Có lỗi xãy ra!`);
     }
-
-    // await fetch(`https://blog-nodejs.onrender.com/api/category/${id}`, {
-    //   method: "DELETE",
-    // }).then(async (res) => {
-    //   fetchData(1);
-    //   const da = await res.json();
-    //   if (res.status === 200) {
-    //     message.success(`Xóa chuyên mục thành công!.`);
-    //   } else {
-    //     message.error(`Có lỗi xãy ra!`);
-    //   }
-    // });
   };
 
   return (

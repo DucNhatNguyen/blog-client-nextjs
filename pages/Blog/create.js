@@ -1,26 +1,16 @@
-import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Upload,
-  Form,
-  Input,
-  Row,
-  Col,
-  message,
-  Select,
-  DatePicker,
-} from "antd";
+import React, { useEffect, useState, useContext } from "react";
+import { Button, Upload, Form, Input, Row, Col, message, Select } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
-import moment from "moment";
 import "dayjs/locale/vi";
 import { Editor } from "@tinymce/tinymce-react";
 import Slugify from "slugify";
-import { getAccessToken, removeAccessToken } from "../../utils/authority.js";
 import { useFetchGet, useEffectAction } from "../../hooks/useFetch";
 import { useRouter } from "next/router";
+import { AppContext } from "../../context/AppContext";
 
 export default function App() {
   const router = useRouter();
+  const { setHeader } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [thumbnail, setImageUrl] = useState();
   const [childCate, setChildCate] = useState([]);
@@ -29,9 +19,9 @@ export default function App() {
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useEffectAction(
-      // `https://blog-nodejs.onrender.com/api/blog`,
-      `http://localhost:8080/api/blog`,
+      `blog`,
       "POST",
       {
         "Access-Control-Allow-Origin": "*",
@@ -90,9 +80,8 @@ export default function App() {
   );
 
   const fetchChildCates = async () => {
-    const { statusCode, response } = await useFetchGet(
-      `https://blog-nodejs.onrender.com/api/category/child`
-    );
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { statusCode, response } = await useFetchGet(`category/child`);
 
     const options = response.data.map((x) => ({
       value: x.id,
@@ -102,6 +91,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    setHeader("Tạo mới Bài viết");
     //get child cates
     fetchChildCates();
   }, []);
@@ -134,7 +124,6 @@ export default function App() {
     <Form
       name="basic"
       layout="vertical"
-      //initialValues={{ remember: true, content: data.content }}
       autoComplete="off"
       style={{ padding: "25px" }}
       onFinish={onFinish}
@@ -199,7 +188,7 @@ export default function App() {
           >
             <Upload
               name="file"
-              action={`https://blog-nodejs.onrender.com/api/blog/upload`}
+              action={`${process.env.ROOT_NODE_API}blog/upload`}
               accept=".png, .jpg, .jpeg"
               beforeUpload={beforeUpload}
               onChange={onChange}
@@ -208,14 +197,16 @@ export default function App() {
               multiple={false}
             >
               {thumbnail ? (
-                <img
-                  src={thumbnail}
-                  alt="avatar"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                  }}
-                />
+                <picture>
+                  <img
+                    src={thumbnail}
+                    alt="avatar"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                </picture>
               ) : (
                 uploadButton
               )}
@@ -240,7 +231,7 @@ export default function App() {
             rules={[{ required: true }]}
           >
             <Editor
-              apiKey="6vtz7yc7wtqz403rvcox0gquz2b707uuinaxql67j2ftnlmt"
+              apiKey={process.env.API_KEY_EDITOR}
               onEditorChange={(content, editor) => {
                 handleChange(parseEditorData(content, editor));
               }}

@@ -84,7 +84,8 @@ const columns = [
 
 export default function App() {
   const router = useRouter();
-  const { isLoginState, setIsLoginState } = useContext(AppContext);
+  const { isLoginState, setIsLoginState, header, setHeader } =
+    useContext(AppContext);
   const [data, setData] = useState();
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -92,7 +93,7 @@ export default function App() {
     setLoading(true);
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useFetchGet(
-      `https://blog-nodejs.onrender.com/api/blog?page=${page}&pagesize=10`
+      `blog?page=${page}&pagesize=10`
     );
 
     if (statusCode == 200) {
@@ -105,6 +106,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    setHeader("Bài Viết");
     if (!isLoginState) {
       router.push("/Home/login");
     }
@@ -117,9 +119,9 @@ export default function App() {
         type="primary"
         danger
         style={{ float: "right", margin: "15px 50px" }}
-        href="/Blog/create"
+        //href="/Blog/create"
       >
-        Add
+        <Link href={`/Blog/create`}>Tạo mới</Link>
       </Button>
       <Table
         loading={loading}

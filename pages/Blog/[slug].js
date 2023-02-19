@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/router";
 import {
   Button,
@@ -17,9 +17,11 @@ import "dayjs/locale/vi";
 import { Editor } from "@tinymce/tinymce-react";
 import Slugify from "slugify";
 import { useFetchGet, useEffectAction } from "../../hooks/useFetch";
+import { AppContext } from "../../context/AppContext";
 
 export default function App() {
   const router = useRouter();
+  const { setHeader } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [thumbnail, setImageUrl] = useState();
   const [data, setData] = useState({});
@@ -32,8 +34,9 @@ export default function App() {
 
   const onFinish = async (values) => {
     console.log({ ...values, content });
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useEffectAction(
-      `https://blog-nodejs.onrender.com/api/blog/${slug}`,
+      `blog/${slug}`,
       "PUT",
       {
         "Access-Control-Allow-Origin": "*",
@@ -47,23 +50,6 @@ export default function App() {
     } else {
       message.error(`Cập nhật bài viết không thành công.`);
     }
-
-    // await fetch(`https://blog-nodejs.onrender.com/api/blog/${slug}`, {
-    //   method: "PUT",
-    //   body: JSON.stringify({ ...values, content, thumbnail }),
-    //   headers: {
-    //     "Access-Control-Allow-Origin": "*",
-    //     "Content-Type": "application/json",
-    //   },
-    // }).then(async (res) => {
-    //   const da = await res.json();
-    //   if (res.status === 200) {
-    //     message.success(`Cập nhật bài viết thành công.`);
-    //     setData(data);
-    //   } else {
-    //     message.error(`Cập nhật bài viết không thành công.`);
-    //   }
-    // });
   };
 
   const onChange = (info) => {
@@ -79,7 +65,6 @@ export default function App() {
     if (info.file.status == "done") {
       setLoading(false);
       setImageUrl(info.file.response.image_url);
-      //message.success(`Cập nhật avatar thành công!`);
     }
   };
   const beforeUpload = (file) => {
@@ -108,9 +93,8 @@ export default function App() {
   );
 
   const fetchChildCates = async () => {
-    const { statusCode, response } = await useFetchGet(
-      `https://blog-nodejs.onrender.com/api/category/child`
-    );
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { statusCode, response } = await useFetchGet(`category/child`);
 
     const options = response.data.map((x) => ({
       value: x.id,
@@ -120,14 +104,13 @@ export default function App() {
   };
 
   useEffect(() => {
+    setHeader("Chỉnh sửa Bài viết");
     //get child cates
     fetchChildCates();
 
     async function fetchData() {
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { statusCode, response } = await useFetchGet(
-        `https://blog-nodejs.onrender.com/api/blog/${slug}`
-      );
+      const { statusCode, response } = await useFetchGet(`blog/${slug}`);
       if (statusCode == 200) {
         form.setFieldsValue(response);
         setData(response);
@@ -162,8 +145,9 @@ export default function App() {
   };
 
   const handleChangeStatus = async (value) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { statusCode, response } = await useEffectAction(
-      `https://blog-nodejs.onrender.com/api/blog/change-status/${slug}`,
+      `blog/change-status/${slug}`,
       "POST",
       {
         "Access-Control-Allow-Origin": "*",
@@ -199,12 +183,7 @@ export default function App() {
             name="title"
             rules={[{ required: true }, { type: "string", min: 3 }]}
           >
-            <Input
-              size="large"
-              onBlur={(e) => {
-                setAutoSlug(e.target.value);
-              }}
-            />
+            <Input size="large" />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -213,7 +192,7 @@ export default function App() {
             name="slug"
             rules={[{ required: true }, { type: "string", min: 3 }]}
           >
-            <Input size="large" />
+            <Input size="large" disabled />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -244,7 +223,7 @@ export default function App() {
           >
             <Upload
               name="file"
-              action={`https://blog-nodejs.onrender.com/api/blog/upload`}
+              action={`${process.env.ROOT_NODE_API}blog/upload`}
               accept=".png, .jpg, .jpeg"
               beforeUpload={beforeUpload}
               onChange={onChange}
@@ -253,14 +232,16 @@ export default function App() {
               multiple={false}
             >
               {thumbnail ? (
-                <img
-                  src={thumbnail}
-                  alt="avatar"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                  }}
-                />
+                <picture>
+                  <img
+                    src={thumbnail}
+                    alt="avatar"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                </picture>
               ) : (
                 uploadButton
               )}
@@ -298,7 +279,7 @@ export default function App() {
             rules={[{ required: true }]}
           >
             <Editor
-              apiKey="6vtz7yc7wtqz403rvcox0gquz2b707uuinaxql67j2ftnlmt"
+              apiKey={process.env.API_KEY_EDITOR}
               onEditorChange={(content, editor) => {
                 handleChange(parseEditorData(content, editor));
               }}

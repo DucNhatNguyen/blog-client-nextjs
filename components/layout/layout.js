@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 
-import { Layout, Menu, theme, Button } from "antd";
+import { Layout, Menu, theme } from "antd";
 import Link from "next/link";
 import {
   TagsOutlined,
@@ -9,6 +9,7 @@ import {
   BookOutlined,
 } from "@ant-design/icons";
 import BreadCrumb from "../BreadCrums";
+import { AppContext } from "../../context/AppContext";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -49,6 +50,7 @@ const App = ({ children }) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+  const { header, setHeader } = useContext(AppContext);
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -99,7 +101,7 @@ const App = ({ children }) => {
               fontSize: "35px",
             }}
           >
-            <span className="header-title">gagagagagagag</span>
+            <span className="header-title">{header}</span>
           </div>
         </Header>
         <BreadCrumb />
