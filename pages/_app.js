@@ -1,13 +1,9 @@
-import React, { useEffect } from "react";
+import React, { lazy } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { AppProvider } from "../context/AppContext.js";
+import LayoutBase from "@components/layout/layout";
 import "../styles/globals.css";
-
-const AppLayout = dynamic(() => import("../components/layout/layout"), {
-  ssr: false,
-});
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
@@ -18,7 +14,7 @@ export default function App({ Component, pageProps }) {
       router.pathname == "/Home/sign-up" ? (
         <Component {...pageProps} />
       ) : (
-        <AppLayout>
+        <LayoutBase>
           <Head>
             <title>CMS - Blogs</title>
             <meta charset="utf-8" />
@@ -28,7 +24,7 @@ export default function App({ Component, pageProps }) {
             />
           </Head>
           <Component {...pageProps} />
-        </AppLayout>
+        </LayoutBase>
       )}
     </AppProvider>
   );

@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-
 import { Layout, Menu, theme } from "antd";
 import Link from "next/link";
 import {
@@ -9,7 +8,7 @@ import {
   BookOutlined,
 } from "@ant-design/icons";
 import BreadCrumb from "../BreadCrums";
-import { AppContext } from "../../context/AppContext";
+import { AppContext } from "@context/AppContext";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -46,12 +45,11 @@ const items = [
   },
 ];
 
-const App = ({ children }) => {
+const LayoutBase = ({ children }) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-  const { header, setHeader } = useContext(AppContext);
-
+  const { header } = useContext(AppContext);
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider
@@ -126,4 +124,4 @@ const App = ({ children }) => {
     </Layout>
   );
 };
-export default App;
+export default LayoutBase;

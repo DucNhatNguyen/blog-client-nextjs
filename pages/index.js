@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { AppContext } from "../context/AppContext.js";
 
 export default function Home() {
-  const redirectTo = "/Home/login";
   if (typeof window === "undefined") return null;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -14,7 +13,7 @@ export default function Home() {
   if (isLoginState) {
     router.push("/Blog");
   } else {
-    router.push(redirectTo);
+    router.push("/Home/login");
   }
   return <></>;
 }
