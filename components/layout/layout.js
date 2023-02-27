@@ -43,6 +43,11 @@ const items = [
     key: "2",
     icon: <TagsOutlined />,
   },
+  {
+    label: <Link href="/MetaData">MetaData</Link>,
+    key: "7",
+    icon: <TagsOutlined />,
+  },
 ];
 
 const LayoutBase = ({ children }) => {
