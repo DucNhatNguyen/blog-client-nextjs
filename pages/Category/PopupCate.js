@@ -15,9 +15,7 @@ export default function PopupCate({
 
   const fetchData = async (id) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { statusCode, response } = await useFetchGet(
-      `https://blog-nodejs.onrender.com/api/category/${id}`
-    );
+    const { statusCode, response } = await useFetchGet(`category/${id}`);
     if (statusCode == 200) {
       form.setFieldsValue(response);
       setData(response);

@@ -17,9 +17,7 @@ export default function PopupTagDetail({
 
     const fetchData = async (id) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { statusCode, response } = await useFetchGet(
-        `https://blog-nodejs.onrender.com/api/tag/${id}`
-      );
+      const { statusCode, response } = await useFetchGet(`tag/${id}`);
       if (statusCode == 200) {
         form.setFieldsValue(response);
         setData(response);
